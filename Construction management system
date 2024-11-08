@@ -1,0 +1,239 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// Structure to store equipment details
+typedef struct Equipment {
+    int equipmentID;
+    char name[100];
+    int quantity;
+    struct Equipment* next;
+} Equipment;
+
+// Structure to store material details
+typedef struct Material {
+    int materialID;
+    char name[100];
+    int quantity;
+    struct Material* next;
+} Material;
+
+// Structure to store request details
+typedef struct Request {
+    int requestID;
+    int itemID;
+    char itemType[10]; // "equipment" or "material"
+    int quantity;
+    struct Request* next;
+} Request;
+
+// Head pointers for linked lists
+Equipment* equipmentHead = NULL;
+Material* materialHead = NULL;
+Request* requestHead = NULL;
+
+// Function to create a new equipment
+Equipment* createEquipment(int equipmentID, const char* name, int quantity) {
+    Equipment* newEquipment = (Equipment*)malloc(sizeof(Equipment));
+    newEquipment->equipmentID = equipmentID;
+    strcpy(newEquipment->name, name);
+    newEquipment->quantity = quantity;
+    newEquipment->next = NULL;
+    return newEquipment;
+}
+
+// Function to add a new equipment to the linked list
+void addEquipment(Equipment* equipment) {
+    if (equipmentHead == NULL) {
+        equipmentHead = equipment;
+    } else {
+        Equipment* temp = equipmentHead;
+        while (temp->next != NULL) {
+            temp = temp->next;
+        }
+        temp->next = equipment;
+    }
+}
+
+// Function to create a new material
+Material* createMaterial(int materialID, const char* name, int quantity) {
+    Material* newMaterial = (Material*)malloc(sizeof(Material));
+    newMaterial->materialID = materialID;
+    strcpy(newMaterial->name, name);
+    newMaterial->quantity = quantity;
+    newMaterial->next = NULL;
+    return newMaterial;
+}
+
+// Function to add a new material to the linked list
+void addMaterial(Material* material) {
+    if (materialHead == NULL) {
+        materialHead = material;
+    } else {
+        Material* temp = materialHead;
+        while (temp->next != NULL) {
+            temp = temp->next;
+        }
+        temp->next = material;
+    }
+}
+
+// Function to create a new request
+Request* createRequest(int requestID, int itemID, const char* itemType, int quantity) {
+    Request* newRequest = (Request*)malloc(sizeof(Request));
+    newRequest->requestID = requestID;
+    newRequest->itemID = itemID;
+    strcpy(newRequest->itemType, itemType);
+    newRequest->quantity = quantity;
+    newRequest->next = NULL;
+    return newRequest;
+}
+
+// Function to add a new request to the linked list
+void addRequest(Request* request) {
+    if (requestHead == NULL) {
+        requestHead = request;
+    } else {
+        Request* temp = requestHead;
+        while (temp->next != NULL) {
+            temp = temp->next;
+        }
+        temp->next = request;
+    }
+}
+
+// Function to find an equipment by ID
+Equipment* findEquipment(int equipmentID) {
+    Equipment* temp = equipmentHead;
+    while (temp != NULL) {
+        if (temp->equipmentID == equipmentID) {
+            return temp;
+        }
+        temp = temp->next;
+    }
+    return NULL;
+}
+
+// Function to find a material by ID
+Material* findMaterial(int materialID) {
+    Material* temp = materialHead;
+    while (temp != NULL) {
+        if (temp->materialID == materialID) {
+            return temp;
+        }
+        temp = temp->next;
+    }
+    return NULL;
+}
+
+// Function to display all equipment
+void displayEquipment() {
+    Equipment* temp = equipmentHead;
+    while (temp != NULL) {
+        printf("Equipment ID: %d, Name: %s, Quantity: %d\n", temp->equipmentID, temp->name, temp->quantity);
+        temp = temp->next;
+    }
+}
+
+// Function to display all materials
+void displayMaterials() {
+    Material* temp = materialHead;
+    while (temp != NULL) {
+        printf("Material ID: %d, Name: %s, Quantity: %d\n", temp->materialID, temp->name, temp->quantity);
+        temp = temp->next;
+    }
+}
+
+// Function to display all requests
+void displayRequests() {
+    Request* temp = requestHead;
+    while (temp != NULL) {
+        printf("Request ID: %d, Item Type: %s, Item ID: %d, Quantity: %d\n", temp->requestID, temp->itemType, temp->itemID, temp->quantity);
+        temp = temp->next;
+    }
+}
+
+// Main function
+int main() {
+    int choice, equipmentID, materialID, requestID, quantity;
+    char name[100], itemType[10];
+    Equipment* equipment;
+    Material* material;
+    Request* request;
+
+    while (1) {
+        printf("\nConstruction Management System\n");
+        printf("1. Add Equipment\n");
+        printf("2. Add Material\n");
+        printf("3. Request Equipment/Material\n");
+        printf("4. Display Equipment\n");
+        printf("5. Display Materials\n");
+        printf("6. Display Requests\n");
+        printf("7. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter equipment ID: ");
+                scanf("%d", &equipmentID);
+                printf("Enter equipment name: ");
+                getchar(); // consume newline character left by scanf
+                fgets(name, sizeof(name), stdin);
+                name[strcspn(name, "\n")] = '\0'; // remove newline character
+                printf("Enter quantity: ");
+                scanf("%d", &quantity);
+                equipment = createEquipment(equipmentID, name, quantity);
+                addEquipment(equipment);
+                break;
+            case 2:
+                printf("Enter material ID: ");
+                scanf("%d", &materialID);
+                printf("Enter material name: ");
+                getchar(); // consume newline character left by scanf
+                fgets(name, sizeof(name), stdin);
+                name[strcspn(name, "\n")] = '\0'; // remove newline character
+                printf("Enter quantity: ");
+                scanf("%d", &quantity);
+                material = createMaterial(materialID, name, quantity);
+                addMaterial(material);
+                break;
+            case 3:
+                printf("Enter request ID: ");
+                scanf("%d", &requestID);
+                printf("Enter item type (equipment/material): ");
+                scanf("%s", itemType);
+                printf("Enter item ID: ");
+                if (strcmp(itemType, "equipment") == 0) {
+                    scanf("%d", &equipmentID);
+                } else {
+                    scanf("%d", &materialID);
+                }
+                printf("Enter quantity: ");
+                scanf("%d", &quantity);
+                if ((strcmp(itemType, "equipment") == 0 && findEquipment(equipmentID) != NULL) ||
+                    (strcmp(itemType, "material") == 0 && findMaterial(materialID) != NULL)) {
+                    request = createRequest(requestID, (strcmp(itemType, "equipment") == 0) ? equipmentID : materialID, itemType, quantity);
+                    addRequest(request);
+                } else {
+                    printf("Invalid item ID.\n");
+                }
+                break;
+            case 4:
+                displayEquipment();
+                break;
+            case 5:
+                displayMaterials();
+                break;
+            case 6:
+                displayRequests();
+                break;
+            case 7:
+                exit(0);
+            default:
+                printf("Invalid choice. Please try again.\n");
+        }
+    }
+
+    return 0;
+}
